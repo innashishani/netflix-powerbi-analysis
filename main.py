@@ -1,0 +1,15 @@
+import pandas as pd 
+data=pd.read_csv('netflix_titles.csv')
+data['date_added']=data['date_added'].str.strip()
+data['date_added']=pd.to_datetime(data['date_added'])
+string_columns=['director', 'cast', 'country','rating','duration']
+data[string_columns]=data[string_columns].fillna('none')
+data=data.drop(columns='date_added')
+#print(data['description'].value_counts())
+data=data.apply(lambda x: x.str.strip() if x.dtype=='object' else x)
+data['duration_time']=data['duration'].str.extract('(\d+)').astype('float')
+data['duration_unit']=data['duration'].str.extract('([A-Za-z]+)')
+data.columns=data.columns.str.lower().str.replace(' ','_')
+data['duration_time'] = data['duration_time'].fillna(0)
+data=data.drop(columns='release_year')
+data.to_csv('cleaned_netflix.csv', index=False)
